@@ -1,0 +1,47 @@
+{
+  "panels": [
+    {
+      "id": 1,
+      "title": "序章：觉醒",
+      "content": "在一个遥远的星球上，一位年轻的探险家睁开了眼睛。周围是陌生的蓝色森林，空气中弥漫着神秘的光芒...",
+      "backgroundImage": "https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=1920&h=1080&fit=crop",
+      "background": "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+    },
+    {
+      "id": 2,
+      "title": "第一章：探索",
+      "content": "他小心翼翼地走进森林深处。奇异的生物在树枝间跳跃，发出悦耳的鸣叫声。这个世界充满了未知的奇迹。",
+      "backgroundImage": "https://images.unsplash.com/photo-1511884642898-4c92249e20b6?w=1920&h=1080&fit=crop",
+      "background": "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)"
+    },
+    {
+      "id": 3,
+      "title": "第二章：相遇",
+      "content": "突然，一个神秘的身影出现在眼前。她穿着发光的长袍，手中握着一颗闪烁的水晶。\n\n"欢迎来到艾瑟里亚，勇敢的旅人。"",
+      "backgroundImage": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1920&h=1080&fit=crop",
+      "background": "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)"
+    },
+    {
+      "id": 4,
+      "title": "第三章：传说",
+      "content": "她讲述了这个星球的古老传说：千年前，一场灾难几乎摧毁了一切。只有传说中的"光之碎片"才能恢复平衡。",
+      "backgroundImage": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1920&h=1080&fit=crop",
+      "background": "linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)"
+    },
+    {
+      "id": 5,
+      "title": "尾声：新的开始",
+      "content": ""你愿意帮助我们找到这些碎片吗？" 她伸出手，眼中闪烁着希望的光芒。\n\n这只是冒险的开始...",
+      "backgroundImage": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&h=1080&fit=crop",
+      "background": "linear-gradient(135deg, #fa709a 0%, #fee140 100%)"
+    }
+  ]
+}
+
+
+
+
+
+
+
+

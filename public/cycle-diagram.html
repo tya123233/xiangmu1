@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>教育恶性循环图示</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 500px;
+        }
+
+        .title {
+            text-align: center;
+            font-size: 28px;
+            font-weight: bold;
+            color: #e74c3c;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .cycle-box {
+            border: 3px solid #e74c3c;
+            border-radius: 15px;
+            padding: 30px;
+            background: linear-gradient(to bottom, #fff5f5, #ffffff);
+            position: relative;
+        }
+
+        .cycle-item {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+            font-size: 20px;
+            color: #2c3e50;
+            font-weight: 500;
+            animation: fadeInLeft 0.5s ease forwards;
+            opacity: 0;
+        }
+
+        .cycle-item:nth-child(1) { animation-delay: 0.1s; }
+        .cycle-item:nth-child(2) { animation-delay: 0.3s; }
+        .cycle-item:nth-child(3) { animation-delay: 0.5s; }
+        .cycle-item:nth-child(4) { animation-delay: 0.7s; }
+        .cycle-item:nth-child(5) { animation-delay: 0.9s; }
+
+        @keyframes fadeInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .arrow {
+            font-size: 28px;
+            color: #e74c3c;
+            margin-right: 15px;
+            font-weight: bold;
+            animation: bounce 1s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .loop-arrow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 25px;
+            padding-top: 25px;
+            border-top: 2px dashed #e74c3c;
+            font-size: 24px;
+            color: #e74c3c;
+            font-weight: bold;
+            gap: 10px;
+        }
+
+        .recycle-icon {
+            font-size: 32px;
+            animation: rotate 3s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        .highlight {
+            background: linear-gradient(120deg, #f39c12 0%, #e74c3c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="title">
+            <span>⚠️</span>
+            <span>教育贫困恶性循环</span>
+        </div>
+
+        <div class="cycle-box">
+            <div class="cycle-item">
+                <span class="arrow">↓</span>
+                <span>教育水平低</span>
+            </div>
+
+            <div class="cycle-item">
+                <span class="arrow">↓</span>
+                <span>就业困难</span>
+            </div>
+
+            <div class="cycle-item">
+                <span class="arrow">↓</span>
+                <span>收入低</span>
+            </div>
+
+            <div class="cycle-item">
+                <span class="arrow">↓</span>
+                <span>无力供子女读书</span>
+            </div>
+
+            <div class="cycle-item">
+                <span class="arrow">↓</span>
+                <span>下一代教育差</span>
+            </div>
+
+            <div class="loop-arrow">
+                <span>└→</span>
+                <span class="highlight">循环往复</span>
+                <span class="recycle-icon">♻️</span>
+            </div>
+        </div>
+
+        <div class="subtitle">
+            贫困代际传递的核心困境
+        </div>
+    </div>
+</body>
+</html>
