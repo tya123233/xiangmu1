@@ -309,8 +309,19 @@ export default function OptimizedFigmaLayout() {
   )
 }
 
+interface DialogComponentProps {
+  dialog: {
+    text: string;
+    position: any;
+    order: number;
+  };
+  currentIndex: number;
+  totalCount: number;
+  onClose: () => void;
+}
+
 // 对话框组件
-function DialogComponent({ dialog, currentIndex, totalCount, onClose }: any) {
+function DialogComponent({ dialog, currentIndex, totalCount, onClose }: DialogComponentProps) {
   useEffect(() => {
     const el = document.getElementById('current-dialog')
     if (el) {

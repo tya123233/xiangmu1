@@ -28,13 +28,15 @@ export default function ScrollStoryPanel({ panel, index }: ScrollStoryPanelProps
       { threshold: 0.2 }
     )
 
-    if (panelRef.current) {
-      observer.observe(panelRef.current)
+    const currentRef = panelRef.current
+
+    if (currentRef) {
+      observer.observe(currentRef)
     }
 
     return () => {
-      if (panelRef.current) {
-        observer.unobserve(panelRef.current)
+      if (currentRef) {
+        observer.unobserve(currentRef)
       }
     }
   }, [])

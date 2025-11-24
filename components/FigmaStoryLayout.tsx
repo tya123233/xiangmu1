@@ -1,14 +1,14 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
 import { gsap } from 'gsap'
 import { 
   storyPhotos, 
-  storyDialogs, 
   getDialogsByPhotoId,
-  CONTAINER_SIZE 
+  CONTAINER_SIZE,
+  StoryDialog
 } from '@/data/story-timeline-layout'
 import { useClickOutside } from '@/hooks/useClickOutside'
 
@@ -43,7 +43,7 @@ export default function FigmaStoryLayout() {
   }, [])
 
   // 处理照片点击
-  const handlePhotoClick = (photoId: string) => {
+  const handlePhotoClick = useCallback((photoId: string) => {
     const dialogs = getDialogsByPhotoId(photoId)
     
     if (activePhotoId === photoId) {
@@ -60,13 +60,13 @@ export default function FigmaStoryLayout() {
       setActivePhotoId(photoId)
       setDialogIndex(0)
     }
-  }
+  }, [activePhotoId, dialogIndex])
 
   // 关闭对话框
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     setActivePhotoId(null)
     setDialogIndex(0)
-  }
+  }, [])
 
   // 键盘支持
   useEffect(() => {
@@ -81,7 +81,7 @@ export default function FigmaStoryLayout() {
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [activePhotoId, dialogIndex])
+  }, [handleClose, handlePhotoClick, activePhotoId])
 
   // 获取当前显示的对话框
   const currentDialog = activePhotoId 
@@ -231,7 +231,7 @@ export default function FigmaStoryLayout() {
  * DialogBox - 对话框组件
  */
 interface DialogBoxProps {
-  dialog: any
+  dialog: StoryDialog
   onClose: () => void
   currentIndex: number
   totalCount: number

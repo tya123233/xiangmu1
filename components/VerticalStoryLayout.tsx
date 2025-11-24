@@ -2,7 +2,6 @@
 
 import { motion } from 'framer-motion'
 import Image from 'next/image'
-import { useState } from 'react'
 
 interface DialogBox {
   id: string
@@ -154,8 +153,6 @@ const dialogBoxes: DialogBox[] = [
 ]
 
 export default function VerticalStoryLayout() {
-  const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null)
-
   return (
     <div className="w-full min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-8">
       <div className="relative w-full max-w-[600px] aspect-[1440/16079] bg-white/30 backdrop-blur-sm rounded-lg shadow-2xl">
@@ -171,7 +168,7 @@ export default function VerticalStoryLayout() {
               height: `${(photo.position.height / 16079) * 100}%`,
               zIndex: photo.zIndex,
             }}
-            onClick={() => setSelectedPhoto(photo.id)}
+            onClick={() => {}}
             whileHover={{
               scale: 1.03,
               zIndex: 100,

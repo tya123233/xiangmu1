@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import InteractivePhotoGrid from '@/components/InteractivePhotoGrid'
 import { interactivePhotosData } from '@/data/interactive-photos-data'
 
@@ -33,7 +34,7 @@ export default function InteractivePhotosPage() {
       </div>
 
       {/* 返回首页按钮 */}
-      <a
+      <Link
         href="/"
         className="fixed bottom-6 left-6 z-50
                  bg-white/90 backdrop-blur-sm
@@ -46,7 +47,7 @@ export default function InteractivePhotosPage() {
       >
         <span>←</span>
         <span>返回首页</span>
-      </a>
+      </Link>
     </main>
   )
 }
