@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { figmaImportedLayout } from '@/data/joiners-layout'
+import ParallelAnimation from '@/components/ParallelAnimation'
 
 // Figma 设计的原点坐标
 const ORIGIN_X = 6971
@@ -27,11 +28,21 @@ interface TimelineElement {
   opacity?: number
   zIndex?: number
   borderRadius?: number
+  content?: string
 }
+
+// 章节数据
+const chapters = [
+  { id: 'start', title: '初遇', y: 0 },
+  { id: 'office', title: '办公室', y: 2800 },
+  { id: 'details', title: '细节', y: 5800 },
+  { id: 'interaction', title: '互动', y: 9800 },
+  { id: 'ending', title: '结局', y: 14800 },
+]
 
 // 从 Figma 提取的所有元素数据
 const timelineElements: TimelineElement[] = [
-  // 背景容器
+  // 背景容器 - 纯白背景
   {
     id: '1207:8',
     type: 'background',
@@ -39,7 +50,7 @@ const timelineElements: TimelineElement[] = [
     y: -2959,
     width: 1440,
     height: 23299,
-    color: '#E8E8E8',
+    color: '#FFFFFF',
     zIndex: 0,
   },
   {
@@ -49,7 +60,7 @@ const timelineElements: TimelineElement[] = [
     y: -2959,
     width: 1440,
     height: 16079,
-    color: '#E0E0E0',
+    color: '#FFFFFF',
     zIndex: 1,
   },
 
@@ -62,7 +73,7 @@ const timelineElements: TimelineElement[] = [
     y: -2836,
     width: 859,
     height: 235,
-    src: '/images/timeline/clock-wall.jpg',
+    // src: '', // 暂时移除图片
     zIndex: 10,
     borderRadius: 12,
   },
@@ -74,7 +85,7 @@ const timelineElements: TimelineElement[] = [
     y: -2495,
     width: 581,
     height: 440,
-    src: '/images/timeline/work-scene-1.jpg',
+    // src: '',
     zIndex: 10,
     borderRadius: 12,
   },
@@ -86,7 +97,7 @@ const timelineElements: TimelineElement[] = [
     y: -1971,
     width: 375,
     height: 448,
-    src: '/images/timeline/portrait-1.jpg',
+    // src: '',
     zIndex: 10,
     borderRadius: 12,
   },
@@ -98,7 +109,7 @@ const timelineElements: TimelineElement[] = [
     y: -1339,
     width: 452,
     height: 689,
-    src: '/images/timeline/office-scene.jpg',
+    // src: '',
     zIndex: 10,
     borderRadius: 12,
   },
@@ -110,7 +121,7 @@ const timelineElements: TimelineElement[] = [
     y: -1339,
     width: 542,
     height: 410,
-    src: '/images/timeline/legs-closeup.jpg',
+    // src: '',
     zIndex: 10,
     borderRadius: 12,
   },
@@ -122,7 +133,7 @@ const timelineElements: TimelineElement[] = [
     y: -888,
     width: 450,
     height: 566,
-    src: '/images/timeline/side-portrait.jpg',
+    // src: '',
     zIndex: 10,
     borderRadius: 12,
   },
@@ -134,7 +145,7 @@ const timelineElements: TimelineElement[] = [
     y: -598,
     width: 622,
     height: 572,
-    src: '/images/timeline/female-portrait.jpg',
+    // src: '',
     zIndex: 10,
     borderRadius: 12,
   },
@@ -146,7 +157,7 @@ const timelineElements: TimelineElement[] = [
     y: 320,
     width: 714,
     height: 666,
-    src: '/images/timeline/male-portrait.jpg',
+    // src: '',
     zIndex: 10,
     borderRadius: 12,
   },
@@ -158,7 +169,7 @@ const timelineElements: TimelineElement[] = [
     y: 1083,
     width: 851,
     height: 625,
-    src: '/images/timeline/office-scene-2.jpg',
+    // src: '',
     zIndex: 10,
     borderRadius: 12,
   },
@@ -170,7 +181,7 @@ const timelineElements: TimelineElement[] = [
     y: 1783,
     width: 490,
     height: 628,
-    src: '/images/timeline/female-full.jpg',
+    // src: '',
     zIndex: 10,
     borderRadius: 12,
   },
@@ -182,7 +193,7 @@ const timelineElements: TimelineElement[] = [
     y: 2593,
     width: 833,
     height: 529,
-    src: '/images/timeline/male-closeup.jpg',
+    // src: '',
     zIndex: 10,
     borderRadius: 12,
   },
@@ -194,7 +205,7 @@ const timelineElements: TimelineElement[] = [
     y: 3304,
     width: 563,
     height: 424,
-    src: '/images/timeline/coffee-cup.jpg',
+    // src: '',
     zIndex: 10,
     borderRadius: 12,
   },
@@ -206,7 +217,7 @@ const timelineElements: TimelineElement[] = [
     y: 4047,
     width: 834,
     height: 774,
-    src: '/images/timeline/female-sitting.jpg',
+    // src: '',
     zIndex: 10,
     borderRadius: 12,
   },
@@ -218,7 +229,7 @@ const timelineElements: TimelineElement[] = [
     y: 4971,
     width: 476,
     height: 535,
-    src: '/images/timeline/side-face.jpg',
+    // src: '',
     zIndex: 10,
     borderRadius: 12,
   },
@@ -230,7 +241,7 @@ const timelineElements: TimelineElement[] = [
     y: 4947,
     width: 695,
     height: 1072,
-    src: '/images/timeline/character-scene.jpg',
+    // src: '',
     zIndex: 10,
     borderRadius: 12,
   },
@@ -242,7 +253,7 @@ const timelineElements: TimelineElement[] = [
     y: 6287,
     width: 967,
     height: 891,
-    src: '/images/timeline/back-view.jpg',
+    // src: '',
     zIndex: 10,
     borderRadius: 12,
   },
@@ -254,7 +265,7 @@ const timelineElements: TimelineElement[] = [
     y: 7497,
     width: 689,
     height: 1040,
-    src: '/images/timeline/profile-2.jpg',
+    // src: '',
     zIndex: 10,
     borderRadius: 12,
   },
@@ -266,7 +277,7 @@ const timelineElements: TimelineElement[] = [
     y: 7497,
     width: 459,
     height: 653,
-    src: '/images/timeline/office-env.jpg',
+    // src: '',
     zIndex: 10,
     borderRadius: 12,
   },
@@ -278,7 +289,7 @@ const timelineElements: TimelineElement[] = [
     y: 8244,
     width: 459,
     height: 861,
-    src: '/images/timeline/working-state.jpg',
+    // src: '',
     zIndex: 10,
     borderRadius: 12,
   },
@@ -290,7 +301,7 @@ const timelineElements: TimelineElement[] = [
     y: 9289,
     width: 1227,
     height: 929,
-    src: '/images/timeline/two-people.jpg',
+    // src: '',
     zIndex: 10,
     borderRadius: 12,
   },
@@ -302,7 +313,7 @@ const timelineElements: TimelineElement[] = [
     y: 10367,
     width: 611,
     height: 808,
-    src: '/images/timeline/scene-1.jpg',
+    // src: '',
     zIndex: 10,
     borderRadius: 12,
   },
@@ -314,7 +325,7 @@ const timelineElements: TimelineElement[] = [
     y: 10698,
     width: 793,
     height: 822,
-    src: '/images/timeline/interaction.jpg',
+    // src: '',
     zIndex: 10,
     borderRadius: 12,
   },
@@ -326,7 +337,7 @@ const timelineElements: TimelineElement[] = [
     y: 11634,
     width: 628,
     height: 860,
-    src: '/images/timeline/discussion.jpg',
+    // src: '',
     zIndex: 10,
     borderRadius: 12,
   },
@@ -338,7 +349,7 @@ const timelineElements: TimelineElement[] = [
     y: 12413,
     width: 691,
     height: 981,
-    src: '/images/timeline/work-moment.jpg',
+    // src: '',
     zIndex: 10,
     borderRadius: 12,
   },
@@ -350,7 +361,7 @@ const timelineElements: TimelineElement[] = [
     y: 13254,
     width: 721,
     height: 997,
-    src: '/images/timeline/character-state.jpg',
+    // src: '',
     zIndex: 10,
     borderRadius: 12,
   },
@@ -362,7 +373,7 @@ const timelineElements: TimelineElement[] = [
     y: 14449,
     width: 657,
     height: 863,
-    src: '/images/timeline/office-detail.jpg',
+    // src: '',
     zIndex: 10,
     borderRadius: 12,
   },
@@ -374,7 +385,7 @@ const timelineElements: TimelineElement[] = [
     y: 15510,
     width: 748,
     height: 700,
-    src: '/images/timeline/scene-2.jpg',
+    // src: '',
     zIndex: 10,
     borderRadius: 12,
   },
@@ -386,7 +397,7 @@ const timelineElements: TimelineElement[] = [
     y: 16381,
     width: 778,
     height: 961,
-    src: '/images/timeline/female-back.jpg',
+    // src: '',
     zIndex: 10,
     borderRadius: 12,
   },
@@ -403,6 +414,7 @@ const timelineElements: TimelineElement[] = [
     opacity: 0.85,
     zIndex: 20,
     borderRadius: 20,
+    content: "那个时钟...我记得总是慢五分钟。",
   },
   {
     id: '1187:472',
@@ -415,6 +427,7 @@ const timelineElements: TimelineElement[] = [
     opacity: 0.85,
     zIndex: 20,
     borderRadius: 20,
+    content: "又是忙碌的一天。",
   },
   {
     id: '1187:480',
@@ -427,6 +440,7 @@ const timelineElements: TimelineElement[] = [
     opacity: 0.85,
     zIndex: 20,
     borderRadius: 20,
+    content: "这是我们第一次在这个办公室相遇，阳光正好洒在你的桌子上。",
   },
   {
     id: '1187:471',
@@ -439,6 +453,7 @@ const timelineElements: TimelineElement[] = [
     opacity: 0.85,
     zIndex: 20,
     borderRadius: 20,
+    content: "“能帮我看看这个吗？”你当时这么问道。",
   },
   {
     id: '1187:474',
@@ -451,6 +466,7 @@ const timelineElements: TimelineElement[] = [
     opacity: 0.85,
     zIndex: 20,
     borderRadius: 20,
+    content: "你的侧脸很专注，让我忍不住多看了几眼。",
   },
   {
     id: '1187:484',
@@ -463,6 +479,7 @@ const timelineElements: TimelineElement[] = [
     opacity: 0.85,
     zIndex: 20,
     borderRadius: 20,
+    content: "后来的故事，就像这杯咖啡一样，慢慢地散发出香气。",
   },
   {
     id: '1187:488',
@@ -475,6 +492,7 @@ const timelineElements: TimelineElement[] = [
     opacity: 0.85,
     zIndex: 20,
     borderRadius: 20,
+    content: "我们开始有了更多的话题，不只是工作。",
   },
   {
     id: '1187:486',
@@ -487,6 +505,7 @@ const timelineElements: TimelineElement[] = [
     opacity: 0.85,
     zIndex: 20,
     borderRadius: 20,
+    content: "午后的阳光总是那么温暖，像极了你的笑容。",
   },
   {
     id: '1187:490',
@@ -499,6 +518,7 @@ const timelineElements: TimelineElement[] = [
     opacity: 0.85,
     zIndex: 20,
     borderRadius: 20,
+    content: "偶尔的眼神交汇，都让我心跳加速。",
   },
   {
     id: '1187:492',
@@ -511,6 +531,7 @@ const timelineElements: TimelineElement[] = [
     opacity: 0.85,
     zIndex: 20,
     borderRadius: 20,
+    content: "这张照片，记录了我们最默契的瞬间。",
   },
   {
     id: '1187:494',
@@ -523,6 +544,7 @@ const timelineElements: TimelineElement[] = [
     opacity: 0.85,
     zIndex: 20,
     borderRadius: 20,
+    content: "时间仿佛静止了。",
   },
   {
     id: '1207:56',
@@ -535,6 +557,7 @@ const timelineElements: TimelineElement[] = [
     opacity: 0.85,
     zIndex: 20,
     borderRadius: 20,
+    content: "每一个细节都值得被珍藏。",
   },
   {
     id: '1207:60',
@@ -547,6 +570,7 @@ const timelineElements: TimelineElement[] = [
     opacity: 0.85,
     zIndex: 20,
     borderRadius: 20,
+    content: "即使只是背影，我也能一眼认出你。",
   },
   {
     id: '1207:72',
@@ -559,6 +583,7 @@ const timelineElements: TimelineElement[] = [
     opacity: 0.85,
     zIndex: 20,
     borderRadius: 20,
+    content: "这是一段测试长文本显示效果的段落，希望能看到文字慢慢出现的效果，感受那种沉浸式的阅读体验。",
   },
   {
     id: '1207:71',
@@ -571,6 +596,7 @@ const timelineElements: TimelineElement[] = [
     opacity: 0.85,
     zIndex: 20,
     borderRadius: 20,
+    content: "未完待续...",
   },
   {
     id: '1207:70',
@@ -639,6 +665,7 @@ export default function StoryTimelineLayout() {
   const [selectedJoinerIndex, setSelectedJoinerIndex] = useState<number | null>(null)
   const [direction, setDirection] = useState<'prev' | 'next'>('next')
   const [isTransitioning, setIsTransitioning] = useState(false)
+  const [activeChapter, setActiveChapter] = useState('start')
 
   const handleElementClick = (id: string) => {
     setClickedElements((prev) => {
@@ -651,6 +678,39 @@ export default function StoryTimelineLayout() {
       return newSet
     })
   }
+
+  // 监听滚动以更新当前章节
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY
+      // 假设 1px 对应 timeline 的 1px (虽然有缩放，但比例是一致的)
+      // 需要根据实际容器高度换算
+      // 计算容器高度（用于参考，但实际章节判断使用 scale）
+      // const containerHeight = 23299 / 1440 * window.innerWidth
+      
+      // 查找当前章节
+      // 简单近似：假设页面高度 = 容器高度
+      // 实际上因为是 padding-bottom hack，页面高度确实很大
+      
+      // 计算当前滚动的相对 Y 值 (相对于原始尺寸)
+      // 容器宽度是 window.innerWidth
+      // 原始宽度是 1440
+      // 缩放比例 scale = window.innerWidth / 1440
+      const scale = window.innerWidth / 1440
+      const currentY = scrollY / scale
+      
+      // 找到最近的章节
+      for (let i = chapters.length - 1; i >= 0; i--) {
+        if (currentY >= chapters[i].y - 500) { // 提前一点触发
+          setActiveChapter(chapters[i].id)
+          break
+        }
+      }
+    }
+    
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   // Joiner 图片导航逻辑 - 优化版，带防抖
   const handleJoinerNavigate = (dir: 'prev' | 'next') => {
@@ -708,29 +768,172 @@ export default function StoryTimelineLayout() {
     ]
     return colors[index % colors.length]
   }
+  
+  // 滚动到章节
+  const scrollToChapter = (y: number) => {
+    const scale = window.innerWidth / 1440
+    window.scrollTo({
+      top: y * scale + 800, // +800 跳过顶部的 Joiner 区域
+      behavior: 'smooth'
+    })
+  }
 
   return (
-    <div className="min-h-screen bg-gray-900 py-12 px-4">
-      <div className="max-w-7xl mx-auto">
-        {/* 标题区域 */}
-        <div className="mb-8 text-center">
-          <h1 className="text-4xl font-bold text-white mb-2">故事时间线</h1>
-          <p className="text-gray-400">原创者：life&apos;s...</p>
+    <div className="min-h-screen bg-white">
+      {/* 章节导航菜单 */}
+      <motion.div 
+        initial={{ opacity: 0, x: 100 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: 1 }}
+        className="fixed right-8 top-1/2 -translate-y-1/2 z-50 hidden md:block"
+      >
+        <div className="bg-white/90 backdrop-blur-sm p-5 rounded-2xl shadow-lg space-y-8 border border-gray-100">
+          {chapters.map((chapter) => (
+            <div 
+              key={chapter.id}
+              className="group relative cursor-pointer flex flex-col items-center gap-3"
+              onClick={() => scrollToChapter(chapter.y)}
+            >
+              <div className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                activeChapter === chapter.id ? 'bg-black scale-125' : 'bg-gray-300 group-hover:bg-gray-500'
+              }`} />
+              <span className={`text-xs font-medium writing-vertical-lr transition-colors ${
+                activeChapter === chapter.id ? 'text-black font-semibold' : 'text-gray-400 group-hover:text-gray-600'
+              }`}>
+                {chapter.title}
+              </span>
+              
+              {activeChapter === chapter.id && (
+                <motion.div 
+                  layoutId="activeIndicator"
+                  className="absolute -left-3 top-1 w-1.5 h-1.5 bg-black rounded-full"
+                />
+              )}
+            </div>
+          ))}
+        </div>
+      </motion.div>
+
+      {/* 页面顶部区域 - 纯白背景融为一体 */}
+      <div className="relative z-10 max-w-[1440px] mx-auto pt-16 px-4">
+        {/* 手绘动画作为标题 */}
+        <ParallelAnimation />
+
+      </div>
+
+      {/* 时间线容器 - 沉浸式全屏，纯白背景 */}
+      <div className="relative w-full">
+        {/* 主画布 - 全屏铺开 */}
+        <div
+          className="relative overflow-hidden w-full"
+          style={{
+            paddingBottom: `${(23299 / 1440) * 100}%`, // 保持宽高比，基于视口宽度
+            backgroundColor: '#FFFFFF', // 纯白背景
+          }}
+        >
+          {/* 绝对定位容器 */}
+          <div className="absolute inset-0">
+            {/* 渲染所有元素 */}
+            {timelineElements.map((element, index) => {
+              const pos = toRelative(element.x, element.y)
+              const isClicked = clickedElements.has(element.id)
+
+              // 背景元素 - 仅渲染非全屏背景的装饰性背景
+              if (element.type === 'background') {
+                // 跳过大背景，因为我们已经用 CSS 处理了
+                if (element.width >= 1440) return null
+                
+                return (
+                  <div
+                    key={element.id}
+                    className="absolute"
+                    style={{
+                      left: `${(pos.left / 1440) * 100}%`,
+                      top: `${(pos.top / 23299) * 100}%`,
+                      width: `${(element.width / 1440) * 100}%`,
+                      height: `${(element.height / 23299) * 100}%`,
+                      backgroundColor: element.color,
+                      zIndex: element.zIndex,
+                    }}
+                  />
+                )
+              }
+
+              // 粉色遮罩块 - 使用 TimelineDialog 组件
+              if (element.type === 'mask') {
+                return (
+                  <TimelineDialog
+                    key={element.id}
+                    element={element}
+                    pos={pos}
+                    isClicked={isClicked}
+                    onClick={() => handleElementClick(element.id)}
+                  />
+                )
+              }
+
+              // 图片元素 - 一开始就存在，无过场动画
+              if (element.type === 'image') {
+                return (
+                  <motion.div
+                    key={element.id}
+                    className="absolute cursor-pointer group"
+                    style={{
+                      left: `${(pos.left / 1440) * 100}%`,
+                      top: `${(pos.top / 23299) * 100}%`,
+                      width: `${(element.width / 1440) * 100}%`,
+                      height: `${(element.height / 23299) * 100}%`,
+                      zIndex: element.zIndex,
+                      borderRadius: `${element.borderRadius}px`,
+                      overflow: 'hidden',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.2)', // 默认阴影
+                    }}
+                    // 移除初始入场动画
+                    whileHover={{ 
+                      scale: 1,
+                      transition: { duration: 0.3 }
+                    }}
+                    onClick={() => handleElementClick(element.id)}
+                  >
+                    {/* 真实图片 */}
+                    {element.src ? (
+                      <img 
+                        src={element.src} 
+                        alt={element.name || 'Story image'}
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                        loading="lazy"
+                      />
+                    ) : (
+                      /* 占位图片 - 实际项目中替换为真实图片 */
+                      <div
+                        className={`w-full h-full bg-gradient-to-br ${getPlaceholderColor(element.id, index)} flex items-center justify-center text-white text-xs p-2 text-center`}
+                      >
+                        <span className="opacity-70">{element.name}</span>
+                      </div>
+                    )}
+                  </motion.div>
+                )
+              }
+
+              return null
+            })}
+          </div>
         </div>
 
-        {/* Joiner 拼贴效果区域 - 从 Figma 精确还原 */}
-        <div className="mb-20 bg-gradient-to-br from-amber-50 via-rose-50 to-blue-50 rounded-3xl p-8 shadow-2xl">
-          <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">
-            📸 精彩瞬间拼贴
-          </h2>
-          <p className="text-center text-gray-600 mb-8">
-            Figma 精确布局 · 1:1 还原设计
-          </p>
+        {/* 右上角文字 */}
+        <div className="absolute top-4 right-4 text-right pointer-events-none" style={{ zIndex: 100 }}>
+          <p className="text-lg font-handwriting text-gray-700">原创者</p>
+          <p className="text-sm text-gray-600">life&apos;s ...</p>
+        </div>
+      </div>
 
+      {/* 精彩瞬间拼贴 - 无边框融入背景 (移到底部) */}
+      <div className="relative z-10 max-w-[1440px] mx-auto py-16 px-4">
+        <div className="mt-8">
           {/* Joiner 容器 - 使用 Figma 提取的精确尺寸比例 */}
           <div className="relative mx-auto" style={{ maxWidth: '1200px' }}>
             <div
-              className="relative w-full bg-white rounded-2xl shadow-xl overflow-hidden"
+              className="relative w-full"
               style={{
                 aspectRatio: '3573/3360', // Figma 画布比例
               }}
@@ -777,16 +980,6 @@ export default function StoryTimelineLayout() {
                       >
                         <span className="opacity-70">照片 {index + 1}</span>
                       </div>
-                      {/* 真实图片时替换为：
-                      <Image
-                        src={layout.imagePath ? `/images/${layout.imagePath}` : '/images/placeholder.jpg'}
-                        alt={`照片 ${index + 1}`}
-                        fill
-                        className="object-cover"
-                        sizes="(max-width: 768px) 400px, 600px"
-                        priority={index < 4}
-                      />
-                      */}
                     </div>
                   </div>
 
@@ -799,181 +992,10 @@ export default function StoryTimelineLayout() {
                         'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(0,0,0,0.08) 100%)',
                     }}
                   />
-
-                  {/* 边缘磨损效果 */}
-                  <div
-                    className="absolute inset-0 pointer-events-none opacity-[0.04]"
-                    style={{
-                      background: `radial-gradient(circle at ${(index * 37) % 100}% ${(index * 53) % 100}%, transparent 65%, rgba(0,0,0,0.4) 100%)`,
-                    }}
-                  />
                 </motion.div>
               ))}
             </div>
-
-            {/* 布局统计信息 */}
-            <div className="mt-6 text-center text-sm text-gray-600">
-              <p>
-                📐 精确还原 · {figmaImportedLayout.length} 张照片 · 画布比例 3573:3360
-              </p>
-            </div>
           </div>
-        </div>
-
-        {/* 时间线容器 - 精确复刻 Figma 设计 */}
-        <div className="relative mx-auto" style={{ maxWidth: '1440px' }}>
-          {/* 主画布 - 使用相对定位容器 */}
-          <div
-            className="relative overflow-hidden"
-            style={{
-              width: '100%',
-              paddingBottom: `${(23299 / 1440) * 100}%`, // 保持宽高比
-              backgroundColor: '#E8E8E8',
-              borderRadius: '24px',
-              boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
-            }}
-          >
-            {/* 绝对定位容器 */}
-            <div className="absolute inset-0">
-              {/* 渲染所有元素 */}
-              {timelineElements.map((element, index) => {
-                const pos = toRelative(element.x, element.y)
-                const isClicked = clickedElements.has(element.id)
-
-                // 背景元素
-                if (element.type === 'background') {
-                  return (
-                    <div
-                      key={element.id}
-                      className="absolute"
-                      style={{
-                        left: `${(pos.left / 1440) * 100}%`,
-                        top: `${(pos.top / 23299) * 100}%`,
-                        width: `${(element.width / 1440) * 100}%`,
-                        height: `${(element.height / 23299) * 100}%`,
-                        backgroundColor: element.color,
-                        zIndex: element.zIndex,
-                      }}
-                    />
-                  )
-                }
-
-                // 粉色遮罩块 - 像对话框一样丝滑弹出
-                if (element.type === 'mask') {
-                  return (
-                    <motion.div
-                      key={element.id}
-                      className="absolute cursor-pointer"
-                      style={{
-                        left: `${(pos.left / 1440) * 100}%`,
-                        top: `${(pos.top / 23299) * 100}%`,
-                        width: `${(element.width / 1440) * 100}%`,
-                        height: `${(element.height / 23299) * 100}%`,
-                        backgroundColor: element.color,
-                        zIndex: element.zIndex,
-                        borderRadius: `${element.borderRadius}px`,
-                        // 移除内联的 opacity 和 transform，交给 motion 控制
-                      }}
-                      // 初始状态：透明、缩小、向下偏移
-                      initial={{ 
-                        opacity: 0, 
-                        scale: 0.5, 
-                        y: 100,
-                        rotate: -5 
-                      }}
-                      // 进入视口时的状态
-                      whileInView={{ 
-                        opacity: isClicked ? 0.95 : (element.opacity || 0.85), 
-                        scale: isClicked ? 1.05 : 1, 
-                        y: 0,
-                        rotate: 0
-                      }}
-                      // 视口检测配置
-                      viewport={{ 
-                        once: false, // 每次进入视口都触发，增加互动感
-                        margin: "-10% 0px -10% 0px", // 上下各留 10% 边距触发
-                        amount: 0.3 // 元素露出 30% 时触发
-                      }}
-                      // 丝滑的弹簧动画配置
-                      transition={{
-                        type: "spring",
-                        stiffness: 200, // 刚度，越大越强力
-                        damping: 15,    // 阻尼，越小越弹
-                        mass: 1,
-                        delay: 0.1      // 轻微延迟
-                      }}
-                      // 悬停交互 - 移除悬浮感
-                      whileHover={{ 
-                        scale: 1,
-                        transition: { duration: 0.2 } 
-                      }}
-                      // 点击交互
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => handleElementClick(element.id)}
-                    />
-                  )
-                }
-
-                // 图片元素 - 优雅浮现
-                if (element.type === 'image') {
-                  return (
-                    <motion.div
-                      key={element.id}
-                      className="absolute cursor-pointer"
-                      style={{
-                        left: `${(pos.left / 1440) * 100}%`,
-                        top: `${(pos.top / 23299) * 100}%`,
-                        width: `${(element.width / 1440) * 100}%`,
-                        height: `${(element.height / 23299) * 100}%`,
-                        zIndex: element.zIndex,
-                        borderRadius: `${element.borderRadius}px`,
-                        overflow: 'hidden',
-                        // 移除内联 transform 和 boxShadow
-                      }}
-                      initial={{ opacity: 0, scale: 0.95, y: 30 }}
-                      whileInView={{ 
-                        opacity: 1, 
-                        scale: isClicked ? 1.02 : 1,
-                        y: 0,
-                        boxShadow: isClicked 
-                          ? '0 10px 30px rgba(0,0,0,0.4)' 
-                          : '0 4px 12px rgba(0,0,0,0.2)'
-                      }}
-                      viewport={{ once: true, margin: "-50px" }}
-                      transition={{ duration: 0.7, ease: "easeOut" }}
-                      // 悬停交互 - 移除悬浮感
-                      whileHover={{ 
-                        scale: 1,
-                        transition: { duration: 0.3 }
-                      }}
-                      onClick={() => handleElementClick(element.id)}
-                    >
-                      {/* 占位图片 - 实际项目中替换为真实图片 */}
-                      <div
-                        className={`w-full h-full bg-gradient-to-br ${getPlaceholderColor(element.id, index)} flex items-center justify-center text-white text-xs p-2 text-center`}
-                      >
-                        <span className="opacity-70">{element.name}</span>
-                      </div>
-                    </motion.div>
-                  )
-                }
-
-                return null
-              })}
-            </div>
-          </div>
-
-          {/* 右上角文字 */}
-          <div className="absolute top-4 right-4 text-right" style={{ zIndex: 100 }}>
-            <p className="text-lg font-handwriting text-gray-700">原创者</p>
-            <p className="text-sm text-gray-600">life&apos;s ...</p>
-          </div>
-        </div>
-
-        {/* 统计信息 */}
-        <div className="mt-8 text-center text-gray-400 text-sm">
-          <p>总计 {timelineElements.filter((e) => e.type === 'image').length} 张图片</p>
-          <p>已点击 {clickedElements.size} 个元素</p>
         </div>
       </div>
 
@@ -994,7 +1016,106 @@ export default function StoryTimelineLayout() {
   )
 }
 
-// Joiner 图片查看器组件
+// 独立的 TimelineDialog 组件，处理动画和打字机效果
+function TimelineDialog({ 
+  element, 
+  pos, 
+  isClicked, 
+  onClick 
+}: { 
+  element: TimelineElement, 
+  pos: { left: number, top: number }, 
+  isClicked: boolean, 
+  onClick: () => void 
+}) {
+  const [displayedContent, setDisplayedContent] = useState('')
+  // 如果没有 content，使用默认占位符
+  const content = element.content || ""
+  const [isInView, setIsInView] = useState(false)
+
+  // 打字机效果
+  useEffect(() => {
+    if (isInView && content) {
+      setDisplayedContent('')
+      // 延迟 800ms 等待对话框完全浮现 (配合动画时长 1.1s)
+      const timeoutId = setTimeout(() => {
+        let index = 0
+        const intervalId = setInterval(() => {
+          index++
+          setDisplayedContent(content.slice(0, index))
+          if (index >= content.length) {
+            clearInterval(intervalId)
+          }
+        }, 80) // 慢速打字
+        
+        return () => clearInterval(intervalId)
+      }, 800)
+
+      return () => clearTimeout(timeoutId)
+    }
+  }, [isInView, content])
+
+  return (
+    <motion.div
+      className="absolute cursor-pointer flex items-center justify-center p-4"
+      style={{
+        left: `${(pos.left / 1440) * 100}%`,
+        top: `${(pos.top / 23299) * 100}%`,
+        width: `${(element.width / 1440) * 100}%`,
+        height: `${(element.height / 23299) * 100}%`,
+        backgroundColor: element.color,
+        zIndex: element.zIndex,
+        borderRadius: `${element.borderRadius}px`,
+      }}
+      // 初始状态：透明、缩小、向下偏移
+      initial={{ 
+        opacity: 0, 
+        scale: 0.6, 
+        y: 100,
+        rotate: -5 
+      }}
+      // 进入视口时的状态
+      whileInView={{ 
+        opacity: isClicked ? 0.95 : (element.opacity || 0.85), 
+        scale: isClicked ? 1.05 : 1, 
+        y: 0,
+        rotate: 0
+      }}
+      onViewportEnter={() => setIsInView(true)}
+      onViewportLeave={() => {
+        setIsInView(false)
+        setDisplayedContent('') // 离开视口重置文字
+      }}
+      // 视口检测配置
+      viewport={{ 
+        once: false, 
+        margin: "-10% 0px -10% 0px", 
+        amount: 0.3 
+      }}
+      // 动画配置：速度增加 30% (时长从 2.0s 减少到 1.5s，再快 25% 到 1.1s)
+      transition={{
+        duration: 1.1,
+        ease: "easeOut", // 柔和的缓动
+      }}
+      // 悬停交互 - 移除悬浮感
+      whileHover={{ 
+        scale: 1,
+        transition: { duration: 0.2 } 
+      }}
+      // 点击交互
+      whileTap={{ scale: 0.95 }}
+      onClick={onClick}
+    >
+      {content && (
+        <p className="text-gray-800 font-medium text-sm md:text-base leading-relaxed text-center">
+          {displayedContent}
+        </p>
+      )}
+    </motion.div>
+  )
+}
+
+// Joiner 图片查看器组件 (保持不变)
 interface JoinerImageViewerProps {
   layouts: typeof figmaImportedLayout
   currentIndex: number
@@ -1036,7 +1157,7 @@ function JoinerImageViewer({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 backdrop-blur-md"
+      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-xl"
       onClick={onClose}
     >
       {/* 关闭按钮 */}
@@ -1106,43 +1227,48 @@ function JoinerImageViewer({
           key={currentLayout.panelId}
           layoutId={currentLayout.panelId}
           onClick={(e) => e.stopPropagation()}
-          className="relative w-[90vw] h-[90vh] md:w-[80vw] md:h-[80vh] max-w-5xl"
+          className="relative w-[90vw] h-[90vh] md:w-[80vw] md:h-[80vh] max-w-5xl perspective-1000"
           style={{
             aspectRatio: `${currentLayout.width}/${currentLayout.height}`,
           }}
-          initial={{ opacity: 0, scale: 0.9, x: xOffset }}
+          initial={{ opacity: 0, scale: 0.8, x: xOffset, rotate: direction === 'next' ? 5 : -5 }}
           animate={{ 
             opacity: 1, 
             scale: 1, 
-            x: 0,
+            x: 0, 
+            rotate: 0,
             transition: {
-              duration: 0.4,
-              ease: [0.43, 0.13, 0.23, 0.96], // 自定义缓动曲线
+              type: "spring",
+              stiffness: 300,
+              damping: 30,
+              mass: 0.8,
             }
           }}
           exit={{ 
             opacity: 0, 
             scale: 0.9, 
             x: -xOffset,
+            rotate: direction === 'next' ? -5 : 5,
             transition: {
               duration: 0.3,
-              ease: [0.43, 0.13, 0.23, 0.96],
+              ease: "easeInOut",
             }
           }}
         >
           {/* 照片主体 - 白色边框 */}
           <motion.div 
-            className="relative w-full h-full bg-white p-2 md:p-3 shadow-2xl"
-            initial={{ scale: 0.95 }}
+            className="relative w-full h-full bg-white p-2 md:p-3 shadow-[0_20px_50px_rgba(0,0,0,0.5)] rounded-sm overflow-hidden ring-1 ring-white/20"
+            initial={{ scale: 0.98 }}
             animate={{ 
               scale: 1,
               transition: {
-                duration: 0.4,
-                ease: "easeOut",
+                type: "spring",
+                stiffness: 400,
+                damping: 30,
               }
             }}
           >
-            <div className="relative w-full h-full overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200">
+            <div className="relative w-full h-full overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 rounded-sm">
               {/* 占位图片 */}
               <motion.div
                 className={`w-full h-full ${getPlaceholderColor(currentLayout.panelId, currentIndex)} 
@@ -1158,16 +1284,6 @@ function JoinerImageViewer({
               >
                 <span className="opacity-70">照片 {currentIndex + 1}</span>
               </motion.div>
-              {/* 真实图片时替换为：
-              <Image
-                src={currentLayout.imagePath ? `/images/${currentLayout.imagePath}` : '/images/placeholder.jpg'}
-                alt={`照片 ${currentIndex + 1}`}
-                fill
-                className="object-contain"
-                sizes="90vw"
-                priority
-              />
-              */}
             </div>
           </motion.div>
 

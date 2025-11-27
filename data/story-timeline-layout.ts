@@ -188,8 +188,8 @@ export const storyDialogs: StoryDialog[] = [
   {
     id: 'dialog-10',
     photoId: 'photo-10',
-    content: 'rn：（苦笑）其实...我们没有在一起。',
-    position: { left: 792, top: 5789, width: 380, height: 90 },
+    content: 'rn：（苦笑）其实...我们没有在一起。这是一个用于测试长文本显示效果的段落，希望能看到文字慢慢出现的效果。',
+    position: { left: 792, top: 5789, width: 380, height: 150 },
     order: 1,
   },
 ]

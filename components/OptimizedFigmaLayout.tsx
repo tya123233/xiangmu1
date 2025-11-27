@@ -110,8 +110,16 @@ const photos = [
   },
 ]
 
+// 位置类型
+interface DialogPosition {
+  left?: string;
+  top?: string;
+  right?: string;
+  bottom?: string;
+}
+
 // 对话框数据
-const dialogs: Record<string, { text: string; position: any; order: number }[]> = {
+const dialogs: Record<string, { text: string; position: DialogPosition; order: number }[]> = {
   'dialog-1': [
     { text: 'fn：那你们是怎么遇见的？', position: { left: '5%', top: '12vh' }, order: 1 },
   ],
@@ -312,7 +320,7 @@ export default function OptimizedFigmaLayout() {
 interface DialogComponentProps {
   dialog: {
     text: string;
-    position: any;
+    position: DialogPosition;
     order: number;
   };
   currentIndex: number;

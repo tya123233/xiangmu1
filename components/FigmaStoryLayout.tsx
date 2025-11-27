@@ -239,17 +239,40 @@ interface DialogBoxProps {
 
 function DialogBox({ dialog, onClose, currentIndex, totalCount }: DialogBoxProps) {
   const dialogRef = useRef<HTMLDivElement>(null)
+  const [displayedContent, setDisplayedContent] = useState('')
 
   // GSAP 动画
   useEffect(() => {
     if (dialogRef.current) {
       gsap.fromTo(
         dialogRef.current,
-        { scale: 0, opacity: 0 },
-        { scale: 1, opacity: 1, duration: 0.4, ease: 'back.out(1.7)' }
+        { scale: 0.6, opacity: 0 },
+        { scale: 1, opacity: 1, duration: 2.0, ease: 'power2.out' }
       )
     }
   }, [dialog.id])
+
+  // 文字打字机效果
+  useEffect(() => {
+    setDisplayedContent('')
+    // 延迟 1500ms 等待对话框完全浮现
+    const timeoutId = setTimeout(() => {
+      let index = 0
+      const content = dialog.content
+      const intervalId = setInterval(() => {
+        index++
+        setDisplayedContent(content.slice(0, index))
+        if (index >= content.length) {
+          clearInterval(intervalId)
+        }
+      }, 80)
+      
+      // 清理定时器
+      return () => clearInterval(intervalId)
+    }, 1500)
+
+    return () => clearTimeout(timeoutId)
+  }, [dialog.content])
 
   // 点击外部关闭
   useClickOutside(dialogRef, onClose)
@@ -268,8 +291,8 @@ function DialogBox({ dialog, onClose, currentIndex, totalCount }: DialogBoxProps
       }}
       onClick={(e) => e.stopPropagation()}
     >
-      <p className="text-sm md:text-base text-gray-800 leading-relaxed">
-        {dialog.content}
+      <p className="text-sm md:text-base text-gray-800 leading-relaxed min-h-[1.5em]">
+        {displayedContent}
       </p>
 
       {/* 进度指示器 */}
