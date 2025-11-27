@@ -1,210 +1,302 @@
-import Link from 'next/link'
+"use client"
+
+import { useState, useEffect, useCallback } from "react"
+import { motion, AnimatePresence } from "framer-motion"
+import { MeshGradient, DotOrbit } from "@paper-design/shaders-react"
+import confetti from "canvas-confetti"
+
+// 交互阶段状态
+type InteractionPhase = "waiting" | "exploding" | "fading" | "redirecting"
+
+// 目标跳转地址
+const TARGET_URL = "https://xiangmu1-xv2u.vercel.app/story-timeline"
 
 export default function Home() {
+  const [speed] = useState(0.5)
+  const [scale] = useState(0.5)
+  const [activeEffect] = useState<"mesh" | "dots" | "combined">("mesh")
+  
+  // 交互状态
+  const [phase, setPhase] = useState<InteractionPhase>("waiting")
+  const [showOrb, setShowOrb] = useState(true)
+  const [showOverlay, setShowOverlay] = useState(false)
+
+  // 预加载目标路由
+  useEffect(() => {
+    // 预加载外部链接（通过 prefetch link）
+    const link = document.createElement('link')
+    link.rel = 'prefetch'
+    link.href = TARGET_URL
+    document.head.appendChild(link)
+    
+    return () => {
+      document.head.removeChild(link)
+    }
+  }, [])
+
+  // 触发油墨爆炸效果
+  const triggerExplosion = useCallback(() => {
+    // 定义自定义墨迹形状 (SVG Path)
+    const inkBlob1 = confetti.shapeFromPath({ path: 'M25 50C11.2 50 0 38.8 0 25C0 11.2 11.2 0 25 0C38.8 0 50 11.2 50 25C50 38.8 38.8 50 25 50Z' }); // 圆润基础形
+    const inkBlob2 = confetti.shapeFromPath({ path: 'M42.6 15.6C44.4 13.6 43.6 9.8 41.4 8.2C38.2 5.8 33.8 2.4 29.4 1.2C23.6 -0.4 16.6 1.4 11.8 5.2C7.6 8.6 4.2 13.2 2.4 18.2C0.8 22.6 1.6 27.4 4.4 30.8C7.4 34.4 11.6 36.8 16 38.4C20.6 40 25.6 40.6 30.2 39.6C35.8 38.4 40.8 35.2 43.8 30.2C45.8 26.8 46.4 22.6 45.2 18.8C44.6 17.6 43.6 16.6 42.6 15.6Z' }); // 不规则飞溅形
+    const inkBlob3 = confetti.shapeFromPath({ path: 'M35.2 5.8C32.6 3.2 28.8 2.2 25.4 2.8C19.8 3.8 15.2 8.4 12.4 13.2C9.8 17.8 8.6 23.2 9.2 28.4C9.6 32.8 11.8 36.8 15.2 39.6C19.4 43 25.2 44.4 30.4 43.2C35.4 42 39.8 38.6 42.4 34C44.2 30.8 44.8 27 44.2 23.4C43.6 19 41.4 15.2 38.2 12.2C37.2 11.2 36.2 10.2 35.2 9.2C35.2 8 35.2 6.8 35.2 5.8Z' }); // 拉长液滴形
+
+    const duration = 1200
+    const animationEnd = Date.now() + duration
+    const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min
+
+    const interval = setInterval(() => {
+      const timeLeft = animationEnd - Date.now()
+
+      if (timeLeft <= 0) {
+        clearInterval(interval)
+        return
+      }
+
+      const particleCount = 30 * (timeLeft / duration)
+
+      // 1. 核心大墨块 (主要视觉)
+      confetti({
+        particleCount: Math.floor(particleCount * 0.5),
+        startVelocity: 35,
+        spread: 360,
+        origin: { x: 0.5, y: 0.5 },
+        colors: ["#ffffff", "#f2f2f2", "#e6e6e6"],
+        shapes: [inkBlob1, inkBlob2], // 使用不规则形状
+        scalar: randomInRange(2, 4),   // 巨大的墨块
+        drift: randomInRange(-0.2, 0.2),
+        gravity: 0.6,
+        disableForReducedMotion: true,
+        zIndex: 9999,
+        flat: true, // 关键：让粒子扁平化，不进行3D旋转，更像液体
+      })
+
+      // 2. 外围飞溅液滴 (细节)
+      confetti({
+        particleCount: Math.floor(particleCount),
+        startVelocity: 55, // 速度更快
+        spread: 360,
+        origin: { x: 0.5, y: 0.5 },
+        colors: ["#ffffff"],
+        shapes: [inkBlob3, "circle"], // 混合圆形和小液滴
+        scalar: randomInRange(0.5, 1.5), // 细小的飞溅
+        drift: randomInRange(-0.8, 0.8), // 强烈的随机漂移
+        gravity: 0.8,
+        disableForReducedMotion: true,
+        zIndex: 9998,
+        flat: true,
+      })
+    }, 60)
+
+    return () => clearInterval(interval)
+  }, [])
+
+  // 处理圆球点击
+  const handleOrbClick = useCallback(() => {
+    if (phase !== "waiting") return
+
+    setPhase("exploding")
+    setShowOrb(false)
+
+    // 触发爆炸
+    triggerExplosion()
+
+    // 1.5秒后开始淡入白色遮罩
+    setTimeout(() => {
+      setPhase("fading")
+      setShowOverlay(true)
+    }, 1500)
+
+    // 2.5秒后跳转到外部链接
+    setTimeout(() => {
+      setPhase("redirecting")
+      window.location.href = TARGET_URL
+    }, 2500)
+  }, [phase, triggerExplosion])
+
   return (
-    <main className="w-full min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 flex items-center justify-center p-8">
-      <div className="max-w-6xl w-full">
-        {/* 主标题 */}
-        <div className="text-center mb-16">
-          <h1 className="text-6xl font-bold text-gray-800 mb-4">
-            交互式数字叙事
-          </h1>
-          <p className="text-xl text-gray-600">
-            探索现代 Web 技术驱动的视觉体验
-          </p>
+    <div className="w-full h-screen bg-black relative overflow-hidden">
+      {/* === 背景层 === */}
+      {activeEffect === "mesh" && (
+        <MeshGradient
+          colors={["#000000", "#1a1a1a", "#333333", "#ffffff"]}
+          speed={speed}
+          distortion={1}
+          swirl={0.8}
+          style={{ width: "100%", height: "100%", position: "absolute", inset: 0 }}
+        />
+      )}
+
+      {activeEffect === "dots" && (
+        <div className="w-full h-full absolute inset-0 bg-black">
+          <DotOrbit
+            colors={["#333333", "#1a1a1a", "#555555", "#222222"]}
+            colorBack="#000000"
+            scale={scale}
+            style={{ width: "100%", height: "100%" }}
+          />
         </div>
+      )}
 
-        {/* 项目卡片 */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {/* 交互式故事 */}
-          <Link
-            href="/story"
-            className="group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden"
-          >
-            <div className="p-8">
-              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <svg
-                  className="w-8 h-8 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                  />
-                </svg>
-              </div>
-              <h2 className="text-3xl font-bold text-gray-800 mb-3">
-                交互式故事
-              </h2>
-              <p className="text-gray-600 mb-4">
-                全屏面板展示，流畅的 GSAP 动画，支持多种交互方式。类似漫画的沉浸式阅读体验。
-              </p>
-              <div className="flex flex-wrap gap-2">
-                <span className="px-3 py-1 bg-blue-100 text-blue-700 text-sm rounded-full">
-                  GSAP 3.12.5
-                </span>
-                <span className="px-3 py-1 bg-purple-100 text-purple-700 text-sm rounded-full">
-                  Hammer.js
-                </span>
-                <span className="px-3 py-1 bg-pink-100 text-pink-700 text-sm rounded-full">
-                  React 19
-                </span>
-              </div>
-            </div>
-            <div className="absolute bottom-4 right-4 text-gray-400 group-hover:text-gray-600 group-hover:translate-x-2 transition-all">
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13 7l5 5m0 0l-5 5m5-5H6"
-                />
-              </svg>
-            </div>
-          </Link>
-
-          {/* Joiners 拼贴 */}
-          <Link
-            href="/joiners"
-            className="group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden"
-          >
-            <div className="p-8">
-              <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <svg
-                  className="w-8 h-8 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                  />
-                </svg>
-              </div>
-              <h2 className="text-3xl font-bold text-gray-800 mb-3">
-                Joiners 拼贴
-              </h2>
-              <p className="text-gray-600 mb-4">
-                灵感来自 David Hockney，使用 Framer Motion layoutId 实现的共享元素过渡动画。
-              </p>
-              <div className="flex flex-wrap gap-2">
-                <span className="px-3 py-1 bg-orange-100 text-orange-700 text-sm rounded-full">
-                  Framer Motion
-                </span>
-                <span className="px-3 py-1 bg-red-100 text-red-700 text-sm rounded-full">
-                  layoutId
-                </span>
-                <span className="px-3 py-1 bg-yellow-100 text-yellow-700 text-sm rounded-full">
-                  AnimatePresence
-                </span>
-              </div>
-            </div>
-            <div className="absolute bottom-4 right-4 text-gray-400 group-hover:text-gray-600 group-hover:translate-x-2 transition-all">
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13 7l5 5m0 0l-5 5m5-5H6"
-                />
-              </svg>
-            </div>
-          </Link>
-
-          {/* 故事时间线 */}
-          <Link
-            href="/story-timeline"
-            className="group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden"
-          >
-            <div className="p-8">
-              <div className="w-16 h-16 bg-gradient-to-br from-pink-500 to-rose-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <svg
-                  className="w-8 h-8 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                  />
-                </svg>
-              </div>
-              <h2 className="text-3xl font-bold text-gray-800 mb-3">
-                故事时间线
-              </h2>
-              <p className="text-gray-600 mb-4">
-                竖版滚动布局，照片与对话框交织，展现办公室故事片段。
-              </p>
-              <div className="flex flex-wrap gap-2">
-                <span className="px-3 py-1 bg-pink-100 text-pink-700 text-sm rounded-full">
-                  竖版布局
-                </span>
-                <span className="px-3 py-1 bg-rose-100 text-rose-700 text-sm rounded-full">
-                  对话框
-                </span>
-                <span className="px-3 py-1 bg-red-100 text-red-700 text-sm rounded-full">
-                  Figma 导入
-                </span>
-              </div>
-            </div>
-            <div className="absolute bottom-4 right-4 text-gray-400 group-hover:text-gray-600 group-hover:translate-x-2 transition-all">
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13 7l5 5m0 0l-5 5m5-5H6"
-                />
-              </svg>
-            </div>
-          </Link>
-        </div>
-
-        {/* 技术栈 */}
-        <div className="mt-16 text-center">
-          <p className="text-gray-500 mb-4">核心技术栈</p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <span className="px-4 py-2 bg-white rounded-lg shadow text-gray-700 font-medium">
-              Next.js 15.1.8
-            </span>
-            <span className="px-4 py-2 bg-white rounded-lg shadow text-gray-700 font-medium">
-              React 19.0.0
-            </span>
-            <span className="px-4 py-2 bg-white rounded-lg shadow text-gray-700 font-medium">
-              TypeScript 5.6.3
-            </span>
-            <span className="px-4 py-2 bg-white rounded-lg shadow text-gray-700 font-medium">
-              Tailwind CSS 3.4.17
-            </span>
+      {activeEffect === "combined" && (
+        <>
+          <MeshGradient
+            colors={["#000000", "#1a1a1a", "#333333", "#ffffff"]}
+            speed={speed * 0.5}
+            distortion={0.5}
+            swirl={0.5}
+            style={{ width: "100%", height: "100%", position: "absolute", inset: 0 }}
+          />
+          <div className="w-full h-full absolute inset-0 opacity-60">
+            <DotOrbit
+              colors={["#333333", "#1a1a1a", "#555555", "#222222"]}
+              colorBack="transparent"
+              scale={scale * 0.8}
+              style={{ width: "100%", height: "100%" }}
+            />
           </div>
-        </div>
+        </>
+      )}
+
+      {/* === 光效装饰层 === */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div
+          className="absolute top-1/4 left-1/3 w-32 h-32 bg-gray-800/5 rounded-full blur-3xl animate-pulse"
+          style={{ animationDuration: `${3 / speed}s` }}
+        />
+        <div
+          className="absolute bottom-1/3 right-1/4 w-24 h-24 bg-white/5 rounded-full blur-2xl animate-pulse"
+          style={{ animationDuration: `${2 / speed}s`, animationDelay: "1s" }}
+        />
+        <div
+          className="absolute top-1/2 right-1/3 w-20 h-20 bg-gray-900/5 rounded-full blur-xl animate-pulse"
+          style={{ animationDuration: `${4 / speed}s`, animationDelay: "0.5s" }}
+        />
       </div>
-    </main>
+
+      {/* === 发光呼吸圆球 === */}
+      <AnimatePresence>
+        {showOrb && (
+          <motion.div
+            className="absolute inset-0 flex items-center justify-center z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0, scale: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <motion.button
+              onClick={handleOrbClick}
+              className="relative w-24 h-24 rounded-full cursor-pointer focus:outline-none"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{
+                scale: [1, 1.08, 1],
+                opacity: 1,
+              }}
+              exit={{
+                scale: 0,
+                opacity: 0,
+              }}
+              transition={{
+                scale: {
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                },
+                opacity: {
+                  duration: 0.5,
+                },
+              }}
+              whileHover={{ scale: 1.15 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              {/* 外发光层 */}
+              <motion.div
+                className="absolute inset-0 rounded-full bg-white/20"
+                animate={{
+                  boxShadow: [
+                    "0 0 40px 20px rgba(255,255,255,0.3), 0 0 80px 40px rgba(255,255,255,0.15)",
+                    "0 0 60px 30px rgba(255,255,255,0.4), 0 0 100px 50px rgba(255,255,255,0.2)",
+                    "0 0 40px 20px rgba(255,255,255,0.3), 0 0 80px 40px rgba(255,255,255,0.15)",
+                  ],
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+              />
+              
+              {/* 中间渐变层 */}
+              <motion.div
+                className="absolute inset-2 rounded-full"
+                style={{
+                  background: "radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0.2) 100%)",
+                }}
+                animate={{
+                  opacity: [0.8, 1, 0.8],
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+              />
+              
+              {/* 核心高亮 */}
+              <div
+                className="absolute inset-4 rounded-full bg-white"
+                style={{
+                  boxShadow: "inset 0 0 20px rgba(255,255,255,1)",
+                }}
+              />
+
+              {/* 提示文字 */}
+              <motion.span
+                className="absolute -bottom-10 left-1/2 -translate-x-1/2 text-white/50 text-sm whitespace-nowrap font-light tracking-wider"
+                animate={{
+                  opacity: [0.3, 0.7, 0.3],
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+              >
+                Click to Enter
+              </motion.span>
+            </motion.button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* === 白色遮罩层 === */}
+      <AnimatePresence>
+        {showOverlay && (
+          <motion.div
+            className="absolute inset-0 bg-white z-[100]"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1, ease: "easeInOut" }}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* === 加载提示（重定向时） === */}
+      <AnimatePresence>
+        {phase === "redirecting" && (
+          <motion.div
+            className="absolute inset-0 flex items-center justify-center z-[110]"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
+            <motion.div
+              className="w-8 h-8 border-2 border-gray-300 border-t-gray-600 rounded-full"
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   )
 }
-
