@@ -1,6 +1,12 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import gsap from 'gsap'
+import { useGSAP } from '@gsap/react'
+
+if (typeof window !== 'undefined') {
+  gsap.registerPlugin(useGSAP)
+}
 
 // 所有路径段配置（完全匹配原始 SVG）
 const PATH_SEGMENTS = [
@@ -56,8 +62,27 @@ const PATH_SEGMENTS = [
 
 export default function ParallelAnimation() {
   const pathRefs = useRef<(SVGPathElement | null)[]>([])
+  const svgRef = useRef<SVGSVGElement>(null)
   const [pathLengths, setPathLengths] = useState<number[]>([])
   const [isReady, setIsReady] = useState(false)
+
+  // 添加轻微晃动效果
+  useGSAP(() => {
+    if (!svgRef.current) return
+    
+    // 描边动画总时长约 8 秒 (delay 3.5 + duration 4.5)
+    // 我们在 8.5 秒后开始轻微晃动，模拟手绘线条的呼吸感
+    gsap.to(svgRef.current, {
+      y: 6, // 上下浮动
+      x: 2, // 极其轻微的左右位移
+      rotation: 0.8, // 极其轻微的旋转
+      duration: 3.5,
+      repeat: -1,
+      yoyo: true,
+      ease: "sine.inOut",
+      delay: 8.5 
+    })
+  }, { scope: svgRef })
 
   useEffect(() => {
     // 计算所有路径长度
@@ -89,6 +114,7 @@ export default function ParallelAnimation() {
       `}</style>
       
       <svg 
+        ref={svgRef}
         viewBox="-10 -20 701 120" 
         className="w-full h-auto"
         style={{ overflow: 'visible' }}
