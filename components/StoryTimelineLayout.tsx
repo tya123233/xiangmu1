@@ -1,8 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
+import { useState, useEffect, useRef } from 'react'
+import Image from 'next/image'
+import { motion, AnimatePresence } from 'framer-motion'
 import ParallelAnimation from '@/components/ParallelAnimation'
+import GestureTutorial from '@/components/GestureTutorial'
 import HeroTitleEntrance from '@/components/HeroTitleEntrance'
 import QuoteTypewriter from '@/components/QuoteTypewriter'
 import DialogueTypewriter from '@/components/DialogueTypewriter'
@@ -10,6 +12,9 @@ import DialogueTypewriter from '@/components/DialogueTypewriter'
 // Figma 设计的原点坐标
 const ORIGIN_X = 6971
 const ORIGIN_Y = -2959
+
+// 图片缩放因子 - 0.7 = 缩小到70%，可以看到更多内容
+const IMAGE_SCALE = 0.65
 
 // 将 Figma 绝对坐标转换为相对坐标
 const toRelative = (x: number, y: number) => ({
@@ -35,11 +40,11 @@ interface TimelineElement {
 
 // 章节数据
 const chapters = [
-  { id: 'start', title: 'Chapter 1', y: 0 }, // 修改这里
-  { id: 'office', title: '办公室', y: 2800 },
-  { id: 'details', title: '细节', y: 5800 },
-  { id: 'interaction', title: '互动', y: 9800 },
-  { id: 'ending', title: '结局', y: 14800 },
+  { id: 'start', title: 'Chapter 1', y: 0 },
+  { id: 'office', title: 'Chapter 2', y: 2800 },
+  { id: 'details', title: 'Chapter 3', y: 5800 },
+  { id: 'interaction', title: 'Chapter 4', y: 9800 },
+  { id: 'ending', title: 'Chapter 5', y: 14800 },
 ]
 
 // 从 Figma 提取的所有元素数据
@@ -666,6 +671,10 @@ const timelineElements: TimelineElement[] = [
 export default function StoryTimelineLayout() {
   const [clickedElements, setClickedElements] = useState<Set<string>>(new Set())
   const [activeChapter, setActiveChapter] = useState('start')
+  const [isUnlocked, setIsUnlocked] = useState(false)
+  const [showToast, setShowToast] = useState(false)
+  const chapter1Ref = useRef<HTMLDivElement>(null)
+  const dividerRef = useRef<HTMLDivElement>(null)
 
   const handleElementClick = (id: string) => {
     setClickedElements((prev) => {
@@ -726,6 +735,42 @@ export default function StoryTimelineLayout() {
     })
   }
 
+  // 滚动到 Chapter 1
+  const scrollToChapter1 = () => {
+    setIsUnlocked(true)
+    setTimeout(() => {
+      chapter1Ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 100)
+  }
+
+  // 处理章节点击
+  const handleChapterClick = (chapter: typeof chapters[0]) => {
+    if (chapter.id === 'start') {
+      scrollToChapter(chapter.y)
+    } else {
+      setShowToast(true)
+      setTimeout(() => setShowToast(false), 2000)
+    }
+  }
+
+  // 滚动锁定：未点击按钮时，禁止滚动超过分隔线
+  useEffect(() => {
+    if (isUnlocked) return
+
+    const handleScrollLock = (e: WheelEvent) => {
+      if (!dividerRef.current) return
+      
+      const dividerRect = dividerRef.current.getBoundingClientRect()
+      // 当分隔线进入视口底部附近时，阻止向下滚动
+      if (dividerRect.top < window.innerHeight - 100 && e.deltaY > 0) {
+        e.preventDefault()
+      }
+    }
+
+    window.addEventListener('wheel', handleScrollLock, { passive: false })
+    return () => window.removeEventListener('wheel', handleScrollLock)
+  }, [isUnlocked])
+
   return (
     <div className="min-h-screen bg-white">
       {/* 章节导航菜单 */}
@@ -740,7 +785,7 @@ export default function StoryTimelineLayout() {
             <div 
               key={chapter.id}
               className="group relative cursor-pointer flex flex-col items-center gap-3"
-              onClick={() => scrollToChapter(chapter.y)}
+              onClick={() => handleChapterClick(chapter)}
             >
               <div className={`w-3 h-3 rounded-full transition-all duration-300 ${
                 activeChapter === chapter.id ? 'bg-black scale-125' : 'bg-gray-300 group-hover:bg-gray-500'
@@ -762,25 +807,71 @@ export default function StoryTimelineLayout() {
         </div>
       </motion.div>
 
+      {/* 提示 Toast */}
+      <AnimatePresence>
+        {showToast && (
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 20 }}
+            className="fixed right-32 top-1/2 -translate-y-1/2 z-[60] bg-black/80 backdrop-blur-md text-white px-6 py-3 rounded-lg shadow-xl text-sm font-medium tracking-wide"
+          >
+            Coming soon... We are working hard on it.
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* 页面顶部区域 - 纯白背景融为一体 */}
       <div className="relative z-10 max-w-[1440px] mx-auto pt-16 px-4 flex flex-col items-center">
         {/* 手绘动画作为标题 */}
         <ParallelAnimation />
 
-        {/* Chapter 1 巨型入场 */}
-        <div className="w-full h-[180px] mt-2 md:mt-4 relative z-0">
-          <HeroTitleEntrance title="Chapter 1" className="w-full h-full" />
-        </div>
+        {/* 手势教学 */}
+        <GestureTutorial />
 
-        {/* 柏拉图名言 - 打字机效果 (移到底部) */}
-        <QuoteTypewriter />
+        {/* 分隔线与按钮 */}
+        <div ref={dividerRef} className="relative w-full flex items-center justify-center py-12">
+          <div className="h-[1px] bg-gray-300 w-1/4 max-w-[200px]" />
+          
+          <motion.button 
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={scrollToChapter1}
+            className="mx-8 w-14 h-14 rounded-full border-2 border-gray-500 bg-white shadow-md flex items-center justify-center hover:shadow-lg hover:border-gray-700 transition-all group z-20 cursor-pointer"
+          >
+            <svg 
+              className="w-6 h-6 text-gray-600 group-hover:text-gray-900 transition-colors animate-bounce" 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+            </svg>
+          </motion.button>
+          
+          <div className="h-[1px] bg-gray-300 w-1/4 max-w-[200px]" />
+        </div>
       </div>
 
-      {/* 间隔 - 适度留白 */}
-      <div className="h-16 md:h-24" />
+      {/* Chapter 1 及以下内容 - 点击按钮后才显示 */}
+      <div 
+        className={`transition-all duration-500 ${isUnlocked ? 'opacity-100' : 'opacity-0 pointer-events-none h-0 overflow-hidden'}`}
+      >
+        <div className="max-w-[1440px] mx-auto px-4 flex flex-col items-center">
+          {/* Chapter 1 巨型入场 */}
+          <div ref={chapter1Ref} className="w-full h-[180px] mt-16 relative z-0 scroll-mt-20">
+            <HeroTitleEntrance title="Chapter 1" className="w-full h-full" />
+          </div>
 
-      {/* 新增：对话打字机 */}
-      <DialogueTypewriter />
+          {/* 柏拉图名言 - 打字机效果 */}
+          <QuoteTypewriter />
+        </div>
+
+        {/* 间隔 - 适度留白 */}
+        <div className="h-16 md:h-24" />
+
+        {/* 新增：对话打字机 */}
+        <DialogueTypewriter />
 
       {/* 时间线容器 - 沉浸式全屏，纯白背景 */}
       <div className="relative w-full">
@@ -837,15 +928,21 @@ export default function StoryTimelineLayout() {
 
               // 图片元素 - 一开始就存在，无过场动画
               if (element.type === 'image') {
+                // 计算缩放后的尺寸和居中偏移
+                const scaledWidth = element.width * IMAGE_SCALE
+                const scaledHeight = element.height * IMAGE_SCALE
+                const offsetX = (element.width - scaledWidth) / 2 // 居中偏移
+                const offsetY = (element.height - scaledHeight) / 2
+                
                 return (
                   <motion.div
                     key={element.id}
                     className="absolute" // 移除 cursor-pointer 和 group
                     style={{
-                      left: `${(pos.left / 1440) * 100}%`,
-                      top: `${(pos.top / 23299) * 100}%`,
-                      width: `${(element.width / 1440) * 100}%`,
-                      height: `${(element.height / 23299) * 100}%`,
+                      left: `${((pos.left + offsetX) / 1440) * 100}%`,
+                      top: `${((pos.top + offsetY) / 23299) * 100}%`,
+                      width: `${(scaledWidth / 1440) * 100}%`,
+                      height: `${(scaledHeight / 23299) * 100}%`,
                       zIndex: element.zIndex,
                       borderRadius: `${element.borderRadius}px`,
                       // overflow: 'hidden', // 可选：如果希望图片完全无拘无束
@@ -854,12 +951,15 @@ export default function StoryTimelineLayout() {
                   >
                     {/* 真实图片 */}
                     {element.src ? (
-                      <img 
-                        src={element.src} 
-                        alt={element.name || 'Story image'}
-                        className="w-full h-full object-cover" // 移除 hover:scale-110
-                        loading="lazy"
-                      />
+                      <div className="relative w-full h-full">
+                        <Image 
+                          src={element.src} 
+                          alt={element.name || 'Story image'}
+                          fill
+                          sizes="(max-width: 768px) 100vw, 50vw"
+                          className="object-cover" // 移除 hover:scale-110
+                        />
+                      </div>
                     ) : (
                       /* 占位图片 - 实际项目中替换为真实图片 */
                       <div
@@ -874,6 +974,26 @@ export default function StoryTimelineLayout() {
 
               return null
             })}
+
+            {/* 结尾：未完待续 (从约 20400px 开始，填满剩余约 2900px) */}
+            <div 
+              className="absolute w-full flex flex-col items-center justify-center z-40"
+              style={{
+                top: `${(20400 / 23299) * 100}%`,
+                bottom: 0,
+                background: 'linear-gradient(to bottom, rgba(255,255,255,0) 0%, #000000 30%, #000000 100%)',
+              }}
+            >
+              <div className="text-white text-center px-4">
+                <h3 className="text-2xl md:text-4xl font-serif mb-4 tracking-widest font-light">
+                  To Be Continued
+                </h3>
+                <p className="text-sm md:text-base font-light opacity-70 tracking-wider">
+                  We are working hard to continue the story...
+                </p>
+              </div>
+            </div>
+
           </div>
         </div>
 
@@ -882,6 +1002,7 @@ export default function StoryTimelineLayout() {
           <p className="text-lg font-handwriting text-gray-700">原创者</p>
           <p className="text-sm text-gray-600">life&apos;s ...</p>
         </div>
+      </div>
       </div>
     </div>
   )

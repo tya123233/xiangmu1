@@ -5,7 +5,7 @@ import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { Josefin_Sans } from 'next/font/google'
-import MemoryTrigger from '@/components/MemoryTrigger'
+import EmbeddedGestureGallery from '@/components/EmbeddedGestureGallery'
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(useGSAP, ScrollTrigger)
@@ -132,20 +132,9 @@ export default function DialogueTypewriter() {
           </div>
         ))}
 
-        {/* Memories Button */}
-        <div 
-          // ref={buttonRef} // 不需要 ref 了，不需要动画控制
-          className="self-center mt-16 mb-16 flex flex-col items-center gap-4" // 移除了 opacity-0 translate-y-8
-        >
-          <div className="w-[375px] h-[450px]">
-            <MemoryTrigger 
-              src="/images/story/Memories.png"
-              alt="Memories"
-              href="/memories"
-              className="w-full h-full"
-              style={{ borderRadius: '20px' }}
-            />
-          </div>
+        {/* 手势控制照片画廊 */}
+        <div className="self-center w-full max-w-xl mb-16">
+          <EmbeddedGestureGallery className="w-full" />
         </div>
       </div>
 

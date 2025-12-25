@@ -1,6 +1,7 @@
 'use client'
 
 import { useRef } from 'react'
+import Image from 'next/image'
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { useRouter } from 'next/navigation'
@@ -90,12 +91,13 @@ export default function MemoryTrigger({
     >
       {/* 图片层 */}
       <div className="relative w-full h-full overflow-hidden bg-transparent">
-        <img
+        <Image
           ref={imageRef}
           src={src}
           alt={alt}
+          fill
           // 移除 filter grayscale，保持原色
-          className="w-full h-full object-contain transform-gpu will-change-transform transition-none"
+          className="object-contain transform-gpu will-change-transform transition-none"
         />
       </div>
 

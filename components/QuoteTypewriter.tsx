@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useRef } from 'react'
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { Josefin_Sans } from 'next/font/google'
@@ -23,8 +23,8 @@ export default function QuoteTypewriter() {
   const progressRef = useRef({ val: 0 })
 
   useGSAP(() => {
-    // 延迟 4 秒开始 (Parallel 动画的一半)
-    const tl = gsap.timeline({ delay: 4 })
+    // 延迟 2.5 秒开始 (Parallel 标题出现后)
+    const tl = gsap.timeline({ delay: 2.5 })
     
     // 打字机效果
     tl.to(progressRef.current, {

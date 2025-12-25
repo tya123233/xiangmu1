@@ -1,13 +1,26 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { figmaImportedLayout } from '@/data/joiners-layout'
 
 export default function JoinersGallery() {
   const [selectedJoinerIndex, setSelectedJoinerIndex] = useState<number | null>(null)
-  const [direction, setDirection] = useState<'prev' | 'next'>('next')
   const [isTransitioning, setIsTransitioning] = useState(false)
+
+  const handleNavigate = useCallback((dir: 'prev' | 'next') => {
+    if (isTransitioning || selectedJoinerIndex === null) return
+    
+    setIsTransitioning(true)
+    
+    const newIndex =
+      dir === 'prev'
+        ? (selectedJoinerIndex - 1 + figmaImportedLayout.length) % figmaImportedLayout.length
+        : (selectedJoinerIndex + 1) % figmaImportedLayout.length
+    
+    setSelectedJoinerIndex(newIndex)
+    setTimeout(() => setIsTransitioning(false), 500)
+  }, [isTransitioning, selectedJoinerIndex])
 
   // 键盘导航
   useEffect(() => {
@@ -24,22 +37,7 @@ export default function JoinersGallery() {
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [selectedJoinerIndex])
-
-  const handleNavigate = (dir: 'prev' | 'next') => {
-    if (isTransitioning || selectedJoinerIndex === null) return
-    
-    setIsTransitioning(true)
-    setDirection(dir)
-    
-    const newIndex =
-      dir === 'prev'
-        ? (selectedJoinerIndex - 1 + figmaImportedLayout.length) % figmaImportedLayout.length
-        : (selectedJoinerIndex + 1) % figmaImportedLayout.length
-    
-    setSelectedJoinerIndex(newIndex)
-    setTimeout(() => setIsTransitioning(false), 500)
-  }
+  }, [selectedJoinerIndex, handleNavigate])
 
   // 确定性颜色生成
   const getPlaceholderColor = (index: number) => {
