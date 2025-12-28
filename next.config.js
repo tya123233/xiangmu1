@@ -20,11 +20,8 @@ const nextConfig = {
   // 启用压缩
   compress: true,
   
-  // 自定义 webpack 配置（如果需要）
-  webpack: (config) => {
-    // 支持导入 GSAP 等库
-    return config;
-  },
+  // Turbopack 配置 (Next.js 16+ 默认使用 Turbopack)
+  turbopack: {},
 }
 
 module.exports = nextConfig
