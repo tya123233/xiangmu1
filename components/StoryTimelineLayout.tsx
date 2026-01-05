@@ -688,26 +688,25 @@ export default function StoryTimelineLayout() {
     })
   }
 
-  // 监听滚动以更新当前章节
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollY = window.scrollY
-      // 计算当前滚动的相对 Y 值 (相对于原始尺寸)
-      const scale = window.innerWidth / 1440
-      const currentY = scrollY / scale
-      
-      // 找到最近的章节
-      for (let i = chapters.length - 1; i >= 0; i--) {
-        if (currentY >= chapters[i].y - 500) { // 提前一点触发
-          setActiveChapter(chapters[i].id)
-          break
-        }
-      }
-    }
-    
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+  // 目前只有 Chapter 1，所以不需要根据滚动更新章节高亮
+  // 当后续章节完成后，可以恢复滚动监听
+  // useEffect(() => {
+  //   const handleScroll = () => {
+  //     const scrollY = window.scrollY
+  //     const scale = window.innerWidth / 1440
+  //     const currentY = scrollY / scale
+  //     
+  //     for (let i = chapters.length - 1; i >= 0; i--) {
+  //       if (currentY >= chapters[i].y - 500) {
+  //         setActiveChapter(chapters[i].id)
+  //         break
+  //       }
+  //     }
+  //   }
+  //   
+  //   window.addEventListener('scroll', handleScroll)
+  //   return () => window.removeEventListener('scroll', handleScroll)
+  // }, [])
 
   // 为占位图片生成确定性颜色（基于元素ID）
   const getPlaceholderColor = (id: string, index: number) => {
