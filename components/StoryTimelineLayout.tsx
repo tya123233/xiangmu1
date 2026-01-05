@@ -674,6 +674,7 @@ export default function StoryTimelineLayout() {
   const [isUnlocked, setIsUnlocked] = useState(false)
   const [showToast, setShowToast] = useState(false)
   const chapter1Ref = useRef<HTMLDivElement>(null)
+  const parallelRef = useRef<HTMLDivElement>(null)
   const dividerRef = useRef<HTMLDivElement>(null)
 
   const handleElementClick = (id: string) => {
@@ -734,11 +735,12 @@ export default function StoryTimelineLayout() {
     })
   }
 
-  // 滚动到 Chapter 1
+  // 滚动到 Chapter 1 (Parallel 标题)
   const scrollToChapter1 = () => {
     setIsUnlocked(true)
     setTimeout(() => {
-      chapter1Ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      // 滚动到 Parallel 标题区域
+      parallelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
     }, 100)
   }
 
@@ -822,14 +824,11 @@ export default function StoryTimelineLayout() {
 
       {/* 页面顶部区域 - 纯白背景融为一体 */}
       <div className="relative z-10 max-w-[1440px] mx-auto pt-16 px-4 flex flex-col items-center">
-        {/* 手绘动画作为标题 */}
-        <ParallelAnimation />
-
-        {/* 手势教学 */}
+        {/* 手势教学 - 作为开场 */}
         <GestureTutorial />
 
         {/* 分隔线与按钮 */}
-        <div ref={dividerRef} className="relative w-full flex items-center justify-center py-12">
+        <div ref={dividerRef} className="relative w-full flex items-center justify-center py-12 mb-20">
           <div className="h-[1px] bg-gray-300 w-1/4 max-w-[200px]" />
           
           <motion.button 
@@ -854,9 +853,14 @@ export default function StoryTimelineLayout() {
 
       {/* Chapter 1 及以下内容 - 点击按钮后才显示 */}
       <div 
-        className={`transition-all duration-500 ${isUnlocked ? 'opacity-100' : 'opacity-0 pointer-events-none h-0 overflow-hidden'}`}
+        className={`transition-all duration-1000 ${isUnlocked ? 'opacity-100' : 'opacity-0 pointer-events-none h-0 overflow-hidden'}`}
       >
         <div className="max-w-[1440px] mx-auto px-4 flex flex-col items-center">
+          {/* Parallel 标题 - 序幕，点击按钮后出现 */}
+          <div ref={parallelRef} className="mb-32 scroll-mt-32">
+             <ParallelAnimation />
+          </div>
+
           {/* Chapter 1 巨型入场 */}
           <div ref={chapter1Ref} className="w-full h-[180px] mt-16 relative z-0 scroll-mt-20">
             <HeroTitleEntrance title="Chapter 1" className="w-full h-full" />

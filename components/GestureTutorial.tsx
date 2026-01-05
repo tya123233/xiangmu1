@@ -75,6 +75,15 @@ export default function GestureTutorial() {
   const lastWristXRef = useRef<number>(0.5)
   const swipeCooldownRef = useRef<number>(0)
   const isProcessingRef = useRef<boolean>(false)
+  
+  // Audio ref
+  const audioRef = useRef<HTMLAudioElement | null>(null)
+
+  // Initialize audio
+  useEffect(() => {
+    audioRef.current = new Audio('/sounds/correct.wav')
+    audioRef.current.volume = 0.5 // 设置合适的音量
+  }, [])
 
   // Trigger confetti
   const triggerConfetti = useCallback(() => {
@@ -92,6 +101,12 @@ export default function GestureTutorial() {
     if (completedSteps.has(stepIndex)) return
     
     isProcessingRef.current = true
+    
+    // Play sound
+    if (audioRef.current) {
+      audioRef.current.currentTime = 0 // 重置播放进度，确保连击时也能播放
+      audioRef.current.play().catch(e => console.log('Audio play failed:', e))
+    }
     
     // Mark as completed
     setCompletedSteps(prev => new Set([...prev, stepIndex]))
