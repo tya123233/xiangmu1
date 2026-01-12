@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, useEffect } from 'react'
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -44,7 +44,46 @@ export default function DialogueTypewriter() {
   const containerRef2 = useRef<HTMLDivElement>(null)
   const textRefs1 = useRef<(HTMLParagraphElement | null)[]>([])
   const textRefs2 = useRef<(HTMLParagraphElement | null)[]>([])
-  const titleRef = useRef<HTMLHeadingElement>(null) // 新增
+  const titleRef = useRef<HTMLHeadingElement>(null)
+  const cafeAudioRef = useRef<HTMLAudioElement | null>(null)
+
+  useEffect(() => {
+    // Initialize audio
+    const audio = new Audio('/sounds/cafe.wav')
+    audio.volume = 0.25
+    audio.loop = true
+    cafeAudioRef.current = audio
+
+    // Unlock function for browser autoplay policies
+    const unlockAudio = () => {
+      if (cafeAudioRef.current) {
+        cafeAudioRef.current.play().then(() => {
+          // If we haven't reached the office title yet, pause it
+          // We just want to "authorize" the audio context here
+          if (!ScrollTrigger.getAll().find(st => st.vars.trigger === containerRef2.current)?.isActive) {
+            cafeAudioRef.current?.pause()
+          }
+          window.removeEventListener('click', unlockAudio)
+          window.removeEventListener('scroll', unlockAudio)
+          window.removeEventListener('touchstart', unlockAudio)
+        }).catch(() => {})
+      }
+    }
+
+    window.addEventListener('click', unlockAudio)
+    window.addEventListener('scroll', unlockAudio, { passive: true })
+    window.addEventListener('touchstart', unlockAudio)
+
+    return () => {
+      if (cafeAudioRef.current) {
+        cafeAudioRef.current.pause()
+        cafeAudioRef.current = null
+      }
+      window.removeEventListener('click', unlockAudio)
+      window.removeEventListener('scroll', unlockAudio)
+      window.removeEventListener('touchstart', unlockAudio)
+    }
+  }, [])
 
   // Part 1 Animation
   useGSAP(() => {
@@ -81,7 +120,7 @@ export default function DialogueTypewriter() {
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: containerRef2.current,
-        start: "top 80%", // 当第二部分进入视口时触发
+        start: "top 80%",
         toggleActions: "play none none none",
       }
     })
@@ -104,11 +143,28 @@ export default function DialogueTypewriter() {
       tl.to({}, { duration: 0.3 })
     })
 
-    // Show Title "In the office..."
+    // Show Title "In the office..." and Start Audio
     if (titleRef.current) {
       tl.fromTo(titleRef.current, 
         { opacity: 0, y: 30 },
-        { opacity: 1, y: 0, duration: 1.5, ease: "power3.out", delay: 0.5 }
+        { 
+          opacity: 1, 
+          y: 0, 
+          duration: 1.5, 
+          ease: "power3.out", 
+          delay: 0.5,
+          onStart: () => {
+            if (cafeAudioRef.current) {
+              cafeAudioRef.current.volume = 0.25
+              const playPromise = cafeAudioRef.current.play()
+              if (playPromise !== undefined) {
+                playPromise.catch(err => {
+                  console.warn("Autoplay blocked by browser. Audio will start on next interaction.", err)
+                })
+              }
+            }
+          }
+        }
       )
     }
 

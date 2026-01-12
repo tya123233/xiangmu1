@@ -56,7 +56,7 @@ const timelineElements: TimelineElement[] = [
     x: 6971,
     y: -2959,
     width: 1440,
-    height: 23299,
+    height: 24070,
     color: '#FFFFFF',
     zIndex: 0,
   },
@@ -66,7 +66,7 @@ const timelineElements: TimelineElement[] = [
     x: 6971,
     y: -2959,
     width: 1440,
-    height: 16079,
+    height: 24070,
     color: '#FFFFFF',
     zIndex: 1,
   },
@@ -409,21 +409,19 @@ const timelineElements: TimelineElement[] = [
     zIndex: 10,
     borderRadius: 12,
   },
-
-  // 粉色遮罩块（Rectangle 系列）
   {
-    id: '1187:482',
-    type: 'mask',
-    x: 7024,
-    y: -2908,
-    width: 299,
-    height: 145,
-    color: '#FFFFFF',
-    opacity: 1,
-    zIndex: 20,
-    borderRadius: 20,
-    content: "那个时钟...我记得总是慢五分钟。",
+    id: 'door-image',
+    type: 'image',
+    name: 'door',
+    x: 7302,
+    y: 17513,
+    width: 800,
+    height: 600,
+    src: '/images/door.png',
+    zIndex: 10,
+    borderRadius: 12,
   },
+
   {
     id: '1187:472',
     type: 'mask',
@@ -435,33 +433,7 @@ const timelineElements: TimelineElement[] = [
     opacity: 1,
     zIndex: 20,
     borderRadius: 20,
-    content: "又是忙碌的一天。",
-  },
-  {
-    id: '1187:480',
-    type: 'mask',
-    x: 7335,
-    y: -1491,
-    width: 760,
-    height: 61,
-    color: '#FFFFFF',
-    opacity: 1,
-    zIndex: 20,
-    borderRadius: 20,
-    content: "这是我们第一次在这个办公室相遇，阳光正好洒在你的桌子上。",
-  },
-  {
-    id: '1187:471',
-    type: 'mask',
-    x: 7641,
-    y: -872,
-    width: 298,
-    height: 175,
-    color: '#FFFFFF',
-    opacity: 1,
-    zIndex: 20,
-    borderRadius: 20,
-    content: "“能帮我看看这个吗？”你当时这么问道。",
+    content: "",
   },
   {
     id: '1187:474',
@@ -474,7 +446,7 @@ const timelineElements: TimelineElement[] = [
     opacity: 1,
     zIndex: 20,
     borderRadius: 20,
-    content: "你的侧脸很专注，让我忍不住多看了几眼。",
+    content: "",
   },
   {
     id: '1187:484',
@@ -487,7 +459,7 @@ const timelineElements: TimelineElement[] = [
     opacity: 1,
     zIndex: 20,
     borderRadius: 20,
-    content: "后来的故事，就像这杯咖啡一样，慢慢地散发出香气。",
+    content: "",
   },
   {
     id: '1187:488',
@@ -500,7 +472,7 @@ const timelineElements: TimelineElement[] = [
     opacity: 1,
     zIndex: 20,
     borderRadius: 20,
-    content: "我们开始有了更多的话题，不只是工作。",
+    content: "",
   },
   {
     id: '1187:486',
@@ -513,7 +485,7 @@ const timelineElements: TimelineElement[] = [
     opacity: 1,
     zIndex: 20,
     borderRadius: 20,
-    content: "午后的阳光总是那么温暖，像极了你的笑容。",
+    content: "",
   },
   {
     id: '1187:490',
@@ -526,7 +498,7 @@ const timelineElements: TimelineElement[] = [
     opacity: 1,
     zIndex: 20,
     borderRadius: 20,
-    content: "偶尔的眼神交汇，都让我心跳加速。",
+    content: "",
   },
   {
     id: '1187:492',
@@ -539,7 +511,7 @@ const timelineElements: TimelineElement[] = [
     opacity: 1,
     zIndex: 20,
     borderRadius: 20,
-    content: "这张照片，记录了我们最默契的瞬间。",
+    content: "",
   },
   {
     id: '1187:494',
@@ -552,7 +524,7 @@ const timelineElements: TimelineElement[] = [
     opacity: 1,
     zIndex: 20,
     borderRadius: 20,
-    content: "时间仿佛静止了。",
+    content: "",
   },
   {
     id: '1207:56',
@@ -565,7 +537,7 @@ const timelineElements: TimelineElement[] = [
     opacity: 1,
     zIndex: 20,
     borderRadius: 20,
-    content: "每一个细节都值得被珍藏。",
+    content: "",
   },
   {
     id: '1207:60',
@@ -578,7 +550,7 @@ const timelineElements: TimelineElement[] = [
     opacity: 1,
     zIndex: 20,
     borderRadius: 20,
-    content: "即使只是背影，我也能一眼认出你。",
+    content: "",
   },
   {
     id: '1207:72',
@@ -591,7 +563,7 @@ const timelineElements: TimelineElement[] = [
     opacity: 1,
     zIndex: 20,
     borderRadius: 20,
-    content: "这是一段测试长文本显示效果的段落，希望能看到文字慢慢出现的效果，感受那种沉浸式的阅读体验。",
+    content: "",
   },
   {
     id: '1207:71',
@@ -604,7 +576,7 @@ const timelineElements: TimelineElement[] = [
     opacity: 1,
     zIndex: 20,
     borderRadius: 20,
-    content: "未完待续...",
+    content: "",
   },
   {
     id: '1207:70',
@@ -882,7 +854,7 @@ export default function StoryTimelineLayout() {
         <div
           className="relative overflow-hidden w-full"
           style={{
-            paddingBottom: `${(23299 / 1440) * 100}%`, // 保持宽高比，基于视口宽度
+            paddingBottom: `${(24070 / 1440) * 100}%`, // 保持宽高比，基于视口宽度
             backgroundColor: '#FFFFFF', // 纯白背景
           }}
         >
@@ -904,9 +876,9 @@ export default function StoryTimelineLayout() {
                     className="absolute"
                     style={{
                       left: `${(pos.left / 1440) * 100}%`,
-                      top: `${(pos.top / 23299) * 100}%`,
+                      top: `${(pos.top / 24070) * 100}%`,
                       width: `${(element.width / 1440) * 100}%`,
-                      height: `${(element.height / 23299) * 100}%`,
+                      height: `${(element.height / 24070) * 100}%`,
                       backgroundColor: element.color,
                       zIndex: element.zIndex,
                     }}
@@ -943,9 +915,9 @@ export default function StoryTimelineLayout() {
                     className="absolute" // 移除 cursor-pointer 和 group
                     style={{
                       left: `${((pos.left + offsetX) / 1440) * 100}%`,
-                      top: `${((pos.top + offsetY) / 23299) * 100}%`,
+                      top: `${((pos.top + offsetY) / 24070) * 100}%`,
                       width: `${(scaledWidth / 1440) * 100}%`,
-                      height: `${(scaledHeight / 23299) * 100}%`,
+                      height: `${(scaledHeight / 24070) * 100}%`,
                       zIndex: element.zIndex,
                       borderRadius: `${element.borderRadius}px`,
                       // overflow: 'hidden', // 可选：如果希望图片完全无拘无束
@@ -978,14 +950,14 @@ export default function StoryTimelineLayout() {
               return null
             })}
 
-            {/* 结尾：未完待续 (从约 20400px 开始，填满剩余约 2900px) */}
+            {/* 结尾：未完待续 (从约 21171px 开始，填满剩余约 2899px) */}
             <div 
               className="absolute w-full flex flex-col items-center justify-center z-40"
               style={{
-                top: `${(20400 / 23299) * 100}%`,
-                bottom: 0,
-                background: 'linear-gradient(to bottom, rgba(255,255,255,0) 0%, #000000 30%, #000000 100%)',
-              }}
+                      top: `${(21171 / 24070) * 100}%`,
+                      bottom: 0,
+                      background: 'linear-gradient(to bottom, rgba(255,255,255,0) 0%, #000000 30%, #000000 100%)',
+                    }}
             >
               <div className="text-white text-center px-4">
                 <h3 className="text-2xl md:text-4xl font-serif mb-4 tracking-widest font-light">
@@ -1000,11 +972,6 @@ export default function StoryTimelineLayout() {
           </div>
         </div>
 
-        {/* 右上角文字 */}
-        <div className="absolute top-4 right-4 text-right pointer-events-none" style={{ zIndex: 100 }}>
-          <p className="text-lg font-handwriting text-gray-700">原创者</p>
-          <p className="text-sm text-gray-600">life&apos;s ...</p>
-        </div>
       </div>
       </div>
     </div>
@@ -1055,9 +1022,9 @@ function TimelineDialog({
       className="absolute cursor-pointer flex flex-col items-center justify-center p-4 shadow-xl border border-gray-100"
       style={{
         left: `${(pos.left / 1440) * 100}%`,
-        top: `${(pos.top / 23299) * 100}%`,
+        top: `${(pos.top / 24070) * 100}%`,
         width: `${(element.width / 1440) * 100}%`,
-        height: `${(element.height / 23299) * 100}%`,
+        height: `${(element.height / 24070) * 100}%`,
         backgroundColor: element.color,
         zIndex: element.zIndex,
         borderRadius: `${element.borderRadius}px`,
